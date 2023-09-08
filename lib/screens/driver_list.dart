@@ -1,14 +1,19 @@
 import 'package:driver_data_preview/Models/driver.dart';
+import 'package:driver_data_preview/Models/performance_data.dart';
 import 'package:driver_data_preview/services/yandex_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class DriverList extends StatefulWidget {
   final List<Driver> driverList;
-  late List<double?> handCashList;
+
+  late List<PerformanceData> performanceDataList;
+
 
   DriverList({super.key, required this.driverList}) {
-    handCashList = List.generate(driverList.length, (index) => null);
+
+    performanceDataList = List.generate(driverList.length, (index) => PerformanceData());
+
   }
 
   @override
@@ -16,6 +21,8 @@ class DriverList extends StatefulWidget {
 }
 
 class _DriverListState extends State<DriverList> {
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,25 +61,36 @@ class _DriverListState extends State<DriverList> {
                 ),
                 onExpansionChanged: (val) {
                   if (val) {
+                    YandexApi api = YandexApi();
                     DateTime now = DateTime.now();
-                    DateTime startDateTime =
-                        DateTime(now.year, now.month, now.day);
+                    DateTime startDateTime =  DateTime(now.year, now.month, now.day);
+                    DateTime nextDay = startDateTime.add(const Duration(days: 1)) ;
 
-                    YandexApi()
-                        .fetchDriverHandCash(
+
+                      api.fetchDriverHandCash(
                             widget.driverList[index].id,
                             '${startDateTime.toIso8601String()}+04:00',
                             '${now.toIso8601String()}+04:00')
                         .then((value) {
                       setState(() {
-                        widget.handCashList[index] = value;
+                        widget.performanceDataList[index].handCash = value;
                       });
                     });
+
+                   //  api.fetchDriverWorkingHours(widget.driverList[index].id, '${startDateTime.toIso8601String()}+04:00', '${nextDay.toIso8601String()}+04:00').then((value) {
+
+                    // });
+
                   } else {
                     setState(() {
-                      widget.handCashList[index] = null;
+                      widget.performanceDataList[index].handCash = null;
                     });
                   }
+
+
+
+
+
                 },
                 childrenPadding:
                     const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
@@ -96,13 +114,13 @@ class _DriverListState extends State<DriverList> {
                         'Hand Cash : ',
                         style: TextStyle(color: Colors.black45),
                       ),
-                      widget.handCashList[index] == null
+                      widget.performanceDataList[index].handCash == null
                           ? const SpinKitThreeBounce(
                               color: Colors.black45,
                               size: 20,
                             )
                           : Text(
-                              '${widget.handCashList[index]}',
+                              '${widget.performanceDataList[index].handCash}',
                               style: TextStyle(color: Colors.black45),
                             ),
                     ],

@@ -102,6 +102,37 @@ class YandexApi{
     }
   }
 
+  Future<dynamic> fetchDriverWorkingHours(String driverId,String fromTime,String toTime) async {
+    final url = Uri.parse('https://fleet-api.taxi.yandex.net/v2/parks/contractors/supply-hours?contractor_profile_id=$driverId&period_from=$fromTime&period_to=$toTime');
+
+    final headers = {
+      'X-Client-ID': _clientId,
+      'X-Api-Key': _apiKey,
+      'X-Park-ID':_partnerId,
+      'Content-Type': 'application/json',
+    };
+
+
+    final response = await http.get(
+      url,
+      headers: headers
+    );
+
+    if (response.statusCode == 200) {
+      // Successfully received a response
+      final jsonResponse = json.decode(response.body);
+      final workingHours = (jsonResponse['supply_duration_seconds']/(60 * 60 )).round(1);
+
+      return workingHours;
+
+    } else {
+      // Handle the error
+      print('Request failed with status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+    }
+  }
+
+
 
 
 }
