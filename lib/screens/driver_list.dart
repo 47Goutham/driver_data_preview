@@ -1,5 +1,4 @@
 import 'package:driver_data_preview/Models/driver.dart';
-import 'package:driver_data_preview/Models/performance_data.dart';
 import 'package:driver_data_preview/services/yandex_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -7,21 +6,13 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 class DriverList extends StatefulWidget {
   final List<Driver> driverList;
 
-  late List<PerformanceData> performanceDataList;
-
-
-  DriverList({super.key, required this.driverList}) {
-
-    performanceDataList = List.generate(driverList.length, (index) => PerformanceData());
-
-  }
+  const DriverList({super.key, required this.driverList}) ;
 
   @override
   State<DriverList> createState() => _DriverListState();
 }
 
 class _DriverListState extends State<DriverList> {
-
 
   @override
   Widget build(BuildContext context) {
@@ -73,17 +64,27 @@ class _DriverListState extends State<DriverList> {
                             '${now.toIso8601String()}+04:00')
                         .then((value) {
                       setState(() {
-                        widget.performanceDataList[index].handCash = value;
+                        widget.driverList[index].handCash = value;
                       });
                     });
 
-                   //  api.fetchDriverWorkingHours(widget.driverList[index].id, '${startDateTime.toIso8601String()}+04:00', '${nextDay.toIso8601String()}+04:00').then((value) {
+                     api.fetchDriverWorkingHours(widget.driverList[index].id, '${startDateTime.toIso8601String()}+04:00', '${nextDay.toIso8601String()}+04:00').then((value) {
+                       setState(() {
+                         widget.driverList[index].workingHours = value;
+                       });
 
-                    // });
+                     });
+
+                     api.fetchDriverOrders(widget.driverList[index].id, '${startDateTime.toIso8601String()}+04:00', '${now.toIso8601String()}+04:00').then((value) {
+
+                       widget.driverList[index].orders = value;
+
+                     });
 
                   } else {
                     setState(() {
-                      widget.performanceDataList[index].handCash = null;
+                      widget.driverList[index].handCash  = null;
+                      widget.driverList[index].workingHours = null;
                     });
                   }
 
@@ -95,16 +96,21 @@ class _DriverListState extends State<DriverList> {
                 childrenPadding:
                     const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
                 children: [
-                  const Row(
+                   Row(
                     children: [
-                      Text(
+                      const Text(
                         'Working Hours : ',
                         style: TextStyle(color: Colors.black45),
                       ),
-                      SpinKitThreeBounce(
+                      widget.driverList[index].workingHours  == null ?
+                      const SpinKitThreeBounce(
                         color: Colors.black45,
                         size: 20,
-                      )
+                      ) :
+                      Text(
+                        '${widget.driverList[index].workingHours }',
+                        style: const TextStyle(color: Colors.black45),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 10),
@@ -114,14 +120,14 @@ class _DriverListState extends State<DriverList> {
                         'Hand Cash : ',
                         style: TextStyle(color: Colors.black45),
                       ),
-                      widget.performanceDataList[index].handCash == null
+                      widget.driverList[index].handCash  == null
                           ? const SpinKitThreeBounce(
                               color: Colors.black45,
                               size: 20,
                             )
                           : Text(
-                              '${widget.performanceDataList[index].handCash}',
-                              style: TextStyle(color: Colors.black45),
+                              '${widget.driverList[index].handCash }',
+                              style: const TextStyle(color: Colors.black45),
                             ),
                     ],
                   ),

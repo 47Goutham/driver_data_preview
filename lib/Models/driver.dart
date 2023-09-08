@@ -1,3 +1,4 @@
+import 'package:driver_data_preview/Models/order.dart';
 import 'package:flutter/services.dart';
 
 class Driver {
@@ -5,6 +6,11 @@ class Driver {
   final String id;
   final String phone;
   String? photoPath;
+
+  double? handCash;
+  double? distance;
+  double? workingHours;
+  List<Order>? orders;
 
      Driver({required this.name,required this.id,required this.phone}) ;
 
@@ -27,3 +33,4 @@ class Driver {
   }
 
 }
+
