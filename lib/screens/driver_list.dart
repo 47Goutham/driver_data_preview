@@ -26,6 +26,22 @@ class _DriverListState extends State<DriverList> {
                 fontWeight: FontWeight.bold),
           ),
           backgroundColor: Colors.blue[100],
+          actions: [
+            Padding(
+              padding: const EdgeInsets.all(5),
+              child: ElevatedButton(
+                onPressed: () {},
+                style: ButtonStyle(
+                    elevation: const MaterialStatePropertyAll(0),
+                    backgroundColor:
+                        MaterialStatePropertyAll(Colors.blue[100])),
+                child: const Icon(
+                  Icons.date_range,
+                  color: Colors.black45,
+                ),
+              ),
+            ),
+          ],
         ),
         body: ListView.builder(
           itemCount: widget.driverList.length,
@@ -92,9 +108,7 @@ class _DriverListState extends State<DriverList> {
                             .length;
                       });
 
-                      api
-                          .fetchOrdersDistance(orders)
-                          .then((value) {
+                      api.fetchOrdersDistance(orders).then((value) {
                         setState(() {
                           widget.driverList[index].distance = value;
                         });
@@ -112,7 +126,6 @@ class _DriverListState extends State<DriverList> {
                 childrenPadding:
                     const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
                 children: [
-
                   Row(
                     children: [
                       const Text(
