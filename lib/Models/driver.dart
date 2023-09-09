@@ -1,4 +1,3 @@
-import 'package:driver_data_preview/Models/order.dart';
 import 'package:flutter/services.dart';
 
 class Driver {
@@ -10,7 +9,7 @@ class Driver {
   double? handCash;
   double? distance;
   double? workingHours;
-  List<Order>? orders;
+  int? ordersCount;
 
      Driver({required this.name,required this.id,required this.phone}) ;
 

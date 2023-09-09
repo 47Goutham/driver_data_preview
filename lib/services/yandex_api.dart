@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:driver_data_preview/Models/order.dart';
 import 'package:http/http.dart'as http;
 
@@ -188,6 +189,64 @@ class YandexApi{
       print('Response body: ${response.body}');
     }
   }
+
+  Future<dynamic> _fetchOrderDistance(String orderId) async {
+    final url = Uri.parse('https://fleet-api.taxi.yandex.net/v1/parks/orders/track?park_id=$_partnerId&order_id=$orderId');
+
+    final headers = {
+      'X-Client-ID': _clientId,
+      'X-Api-Key': _apiKey,
+      'X-Park-ID':_partnerId,
+      'Content-Type': 'application/json',
+    };
+
+    final response = await http.post(
+      url,
+      headers: headers
+    );
+
+    if (response.statusCode == 200) {
+      // Successfully received a response
+      final jsonResponse = json.decode(response.body);
+
+      DateTime maxTrackedAt = DateTime.utc(0, 1, 1);
+      double maxDistance = 0 ;
+
+      for(final snapshot in  jsonResponse['track'] ){
+        if(DateTime.parse(snapshot['tracked_at']).isAfter(maxTrackedAt)) {
+          maxTrackedAt = DateTime.parse(snapshot['tracked_at']) ;
+
+          maxDistance = snapshot['distance'] ?? 0  ;
+        }
+      }
+
+      return maxDistance;
+
+    } else {
+      // Handle the error
+      print('Request failed with status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+    }
+  }
+
+  Future<dynamic> fetchOrdersDistance(List<Order> orders) async {
+    final futures = <Future<dynamic>>[];
+
+    for (Order order in orders) {
+      futures.add(_fetchOrderDistance(order.id));
+    }
+
+    var results = await Future.wait(futures);
+
+    double totalDistance = 0;
+    for (var result in results) {
+      totalDistance += result;
+    }
+    totalDistance = double.parse((totalDistance/1000).toStringAsFixed(1))  ;
+
+   return totalDistance;
+  }
+
 
 
 
