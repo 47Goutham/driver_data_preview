@@ -5,11 +5,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class DriverList extends StatefulWidget {
   final List<Driver> driverList;
-  late List<double?> handCashList;
 
-  DriverList({super.key, required this.driverList}) {
-    handCashList = List.generate(driverList.length, (index) => null);
-  }
+  const DriverList({super.key, required this.driverList});
 
   @override
   State<DriverList> createState() => _DriverListState();
@@ -54,42 +51,139 @@ class _DriverListState extends State<DriverList> {
                 ),
                 onExpansionChanged: (val) {
                   if (val) {
+                    YandexApi api = YandexApi();
                     DateTime now = DateTime.now();
                     DateTime startDateTime =
                         DateTime(now.year, now.month, now.day);
+                    DateTime nextDay =
+                        startDateTime.add(const Duration(days: 1));
 
-                    YandexApi()
+                    api
                         .fetchDriverHandCash(
                             widget.driverList[index].id,
                             '${startDateTime.toIso8601String()}+04:00',
                             '${now.toIso8601String()}+04:00')
                         .then((value) {
                       setState(() {
-                        widget.handCashList[index] = value;
+                        widget.driverList[index].handCash = value;
+                      });
+                    });
+
+                    api
+                        .fetchDriverWorkingHours(
+                            widget.driverList[index].id,
+                            '${startDateTime.toIso8601String()}+04:00',
+                            '${nextDay.toIso8601String()}+04:00')
+                        .then((value) {
+                      setState(() {
+                        widget.driverList[index].workingHours = value;
+                      });
+                    });
+
+                    api
+                        .fetchDriverOrders(
+                            widget.driverList[index].id,
+                            '${startDateTime.toIso8601String()}+04:00',
+                            '${now.toIso8601String()}+04:00')
+                        .then((orders) {
+                      setState(() {
+                        widget.driverList[index].ordersCount = orders
+                            .where((order) => order.status == 'complete')
+                            .length;
+                      });
+
+                      api
+                          .fetchOrdersDistance(orders)
+                          .then((value) {
+                        setState(() {
+                          widget.driverList[index].distance = value;
+                        });
                       });
                     });
                   } else {
-
                     setState(() {
-                      widget.handCashList[index] = null;
+                      widget.driverList[index].handCash = null;
+                      widget.driverList[index].workingHours = null;
+                      widget.driverList[index].ordersCount = null;
+                      widget.driverList[index].distance = null;
                     });
                   }
                 },
+                childrenPadding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
                 children: [
-                  Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 8, horizontal: 10),
-                      child: widget.handCashList[index] == null
-                          ? const SpinKitSpinningCircle(
-                              color: Colors.yellow, size: 30)
-                          : Container(
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 7, horizontal: 0),
-                              child: Text(
-                                'Hand Cash :  ${widget.handCashList[index]}',
-                                style: const TextStyle(color: Colors.black45),
-                              ),
-                            ))
+
+                  Row(
+                    children: [
+                      const Text(
+                        'Working Hours : ',
+                        style: TextStyle(color: Colors.black45),
+                      ),
+                      widget.driverList[index].workingHours == null
+                          ? const SpinKitThreeBounce(
+                              color: Colors.black45,
+                              size: 15,
+                            )
+                          : Text(
+                              '${widget.driverList[index].workingHours}',
+                              style: const TextStyle(color: Colors.black45),
+                            ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      const Text(
+                        'Hand Cash : ',
+                        style: TextStyle(color: Colors.black45),
+                      ),
+                      widget.driverList[index].handCash == null
+                          ? const SpinKitThreeBounce(
+                              color: Colors.black45,
+                              size: 15,
+                            )
+                          : Text(
+                              '${widget.driverList[index].handCash}',
+                              style: const TextStyle(color: Colors.black45),
+                            ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      const Text(
+                        'Orders : ',
+                        style: TextStyle(color: Colors.black45),
+                      ),
+                      widget.driverList[index].ordersCount == null
+                          ? const SpinKitThreeBounce(
+                              color: Colors.black45,
+                              size: 15,
+                            )
+                          : Text(
+                              '${widget.driverList[index].ordersCount}',
+                              style: const TextStyle(color: Colors.black45),
+                            ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      const Text(
+                        'Distance(KM) : ',
+                        style: TextStyle(color: Colors.black45),
+                      ),
+                      widget.driverList[index].distance == null
+                          ? const SpinKitThreeBounce(
+                              color: Colors.black45,
+                              size: 15,
+                            )
+                          : Text(
+                              '${widget.driverList[index].distance}',
+                              style: const TextStyle(color: Colors.black45),
+                            ),
+                    ],
+                  ),
                 ],
               ),
             );

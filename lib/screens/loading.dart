@@ -19,8 +19,7 @@ class _LoadingState extends State<Loading> {
 
   Future<void> getDriverProfiles() async {
 
-    YandexApi api = YandexApi();
-    final response = await api.fetchDriverProfiles();
+    final response = await YandexApi().fetchDriverProfiles();
     final driverProfiles = response['driver_profiles'];
 
     for (final profile in driverProfiles) {
@@ -42,7 +41,7 @@ class _LoadingState extends State<Loading> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context1) => DriverList(driverList: driverList),
+        builder: (context) => DriverList(driverList: driverList),
       ),
     );
 

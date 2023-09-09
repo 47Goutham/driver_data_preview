@@ -6,6 +6,11 @@ class Driver {
   final String phone;
   String? photoPath;
 
+  double? handCash;
+  double? distance;
+  double? workingHours;
+  int? ordersCount;
+
      Driver({required this.name,required this.id,required this.phone}) ;
 
   Future<void> assignPhotoPath() async {
@@ -27,3 +32,4 @@ class Driver {
   }
 
 }
+
