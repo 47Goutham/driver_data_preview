@@ -122,7 +122,7 @@ class _DriverListState extends State<DriverList> {
                       widget.driverList[index].workingHours == null
                           ? const SpinKitThreeBounce(
                               color: Colors.black45,
-                              size: 20,
+                              size: 15,
                             )
                           : Text(
                               '${widget.driverList[index].workingHours}',
@@ -140,7 +140,7 @@ class _DriverListState extends State<DriverList> {
                       widget.driverList[index].handCash == null
                           ? const SpinKitThreeBounce(
                               color: Colors.black45,
-                              size: 20,
+                              size: 15,
                             )
                           : Text(
                               '${widget.driverList[index].handCash}',
@@ -158,7 +158,7 @@ class _DriverListState extends State<DriverList> {
                       widget.driverList[index].ordersCount == null
                           ? const SpinKitThreeBounce(
                               color: Colors.black45,
-                              size: 20,
+                              size: 15,
                             )
                           : Text(
                               '${widget.driverList[index].ordersCount}',
@@ -176,7 +176,7 @@ class _DriverListState extends State<DriverList> {
                       widget.driverList[index].distance == null
                           ? const SpinKitThreeBounce(
                               color: Colors.black45,
-                              size: 20,
+                              size: 15,
                             )
                           : Text(
                               '${widget.driverList[index].distance}',
