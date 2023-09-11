@@ -87,12 +87,10 @@ class _DriverListState extends State<DriverList> {
                   if (val) {
                     YandexApi api = YandexApi();
                     DateTime now = DateTime.now();
-                    DateTime nowDate = DateTime(now.day,now.month,now.year);
-                    DateTime startDate =  selectedDate != null ? DateTime(selectedDate!.day,selectedDate!.month,selectedDate!.year) : nowDate;
+                    DateTime nowDate = DateTime(now.year,now.month,now.day);
+                    DateTime startDate =  selectedDate != null ? DateTime(selectedDate!.year,selectedDate!.month,selectedDate!.day) : nowDate;
                     DateTime nextDay =    nowDate.add(const Duration(days: 1));
-                    print(nowDate);
-                    print(startDate);
-                    print(nextDay);
+
                     api
                         .fetchDriverHandCash(
                             widget.driverList[index].id,
