@@ -13,6 +13,7 @@ class DriverList extends StatefulWidget {
 }
 
 class _DriverListState extends State<DriverList> {
+  DateTime? selectedDate;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +31,24 @@ class _DriverListState extends State<DriverList> {
             Padding(
               padding: const EdgeInsets.all(5),
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: ()  async {
+                  DateTime now =  DateTime.now();
+                  DateTime firstDate = now.add(const Duration(days:-2));
+                  DateTime lastDate = now;
+
+                    final pickedDate =    await showDatePicker(
+                                context: context,
+                                initialDate: now,
+                                firstDate: firstDate,
+                                lastDate: lastDate);
+
+
+                    setState(() {
+                      selectedDate = pickedDate;
+                    });
+
+                  
+                },
                 style: ButtonStyle(
                     elevation: const MaterialStatePropertyAll(0),
                     backgroundColor:
@@ -69,15 +87,16 @@ class _DriverListState extends State<DriverList> {
                   if (val) {
                     YandexApi api = YandexApi();
                     DateTime now = DateTime.now();
-                    DateTime startDateTime =
-                        DateTime(now.year, now.month, now.day);
-                    DateTime nextDay =
-                        startDateTime.add(const Duration(days: 1));
-
+                    DateTime nowDate = DateTime(now.day,now.month,now.year);
+                    DateTime startDate =  selectedDate != null ? DateTime(selectedDate!.day,selectedDate!.month,selectedDate!.year) : nowDate;
+                    DateTime nextDay =    nowDate.add(const Duration(days: 1));
+                    print(nowDate);
+                    print(startDate);
+                    print(nextDay);
                     api
                         .fetchDriverHandCash(
                             widget.driverList[index].id,
-                            '${startDateTime.toIso8601String()}+04:00',
+                            '${startDate.toIso8601String()}+04:00',
                             '${now.toIso8601String()}+04:00')
                         .then((value) {
                       setState(() {
@@ -88,7 +107,7 @@ class _DriverListState extends State<DriverList> {
                     api
                         .fetchDriverWorkingHours(
                             widget.driverList[index].id,
-                            '${startDateTime.toIso8601String()}+04:00',
+                            '${startDate.toIso8601String()}+04:00',
                             '${nextDay.toIso8601String()}+04:00')
                         .then((value) {
                       setState(() {
@@ -99,7 +118,7 @@ class _DriverListState extends State<DriverList> {
                     api
                         .fetchDriverOrders(
                             widget.driverList[index].id,
-                            '${startDateTime.toIso8601String()}+04:00',
+                            '${startDate.toIso8601String()}+04:00',
                             '${now.toIso8601String()}+04:00')
                         .then((orders) {
                       setState(() {
