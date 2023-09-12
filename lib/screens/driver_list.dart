@@ -13,6 +13,7 @@ class DriverList extends StatefulWidget {
 }
 
 class _DriverListState extends State<DriverList> {
+  DateTime? selectedDate;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,6 +27,39 @@ class _DriverListState extends State<DriverList> {
                 fontWeight: FontWeight.bold),
           ),
           backgroundColor: Colors.blue[100],
+          actions: [
+            Padding(
+              padding: const EdgeInsets.all(5),
+              child: ElevatedButton(
+                onPressed: ()  async {
+                  DateTime now =  DateTime.now();
+                  DateTime firstDate = now.add(const Duration(days:-2));
+                  DateTime lastDate = now;
+
+                    final pickedDate =    await showDatePicker(
+                                context: context,
+                                initialDate: now,
+                                firstDate: firstDate,
+                                lastDate: lastDate);
+
+
+                    setState(() {
+                      selectedDate = pickedDate;
+                    });
+
+                  
+                },
+                style: ButtonStyle(
+                    elevation: const MaterialStatePropertyAll(0),
+                    backgroundColor:
+                        MaterialStatePropertyAll(Colors.blue[100])),
+                child: const Icon(
+                  Icons.date_range,
+                  color: Colors.black45,
+                ),
+              ),
+            ),
+          ],
         ),
         body: ListView.builder(
           itemCount: widget.driverList.length,
@@ -53,15 +87,14 @@ class _DriverListState extends State<DriverList> {
                   if (val) {
                     YandexApi api = YandexApi();
                     DateTime now = DateTime.now();
-                    DateTime startDateTime =
-                        DateTime(now.year, now.month, now.day);
-                    DateTime nextDay =
-                        startDateTime.add(const Duration(days: 1));
+                    DateTime nowDate = DateTime(now.year,now.month,now.day);
+                    DateTime startDate =  selectedDate != null ? DateTime(selectedDate!.year,selectedDate!.month,selectedDate!.day) : nowDate;
+                    DateTime nextDay =    nowDate.add(const Duration(days: 1));
 
                     api
                         .fetchDriverHandCash(
                             widget.driverList[index].id,
-                            '${startDateTime.toIso8601String()}+04:00',
+                            '${startDate.toIso8601String()}+04:00',
                             '${now.toIso8601String()}+04:00')
                         .then((value) {
                       setState(() {
@@ -72,7 +105,7 @@ class _DriverListState extends State<DriverList> {
                     api
                         .fetchDriverWorkingHours(
                             widget.driverList[index].id,
-                            '${startDateTime.toIso8601String()}+04:00',
+                            '${startDate.toIso8601String()}+04:00',
                             '${nextDay.toIso8601String()}+04:00')
                         .then((value) {
                       setState(() {
@@ -83,7 +116,7 @@ class _DriverListState extends State<DriverList> {
                     api
                         .fetchDriverOrders(
                             widget.driverList[index].id,
-                            '${startDateTime.toIso8601String()}+04:00',
+                            '${startDate.toIso8601String()}+04:00',
                             '${now.toIso8601String()}+04:00')
                         .then((orders) {
                       setState(() {
@@ -92,9 +125,7 @@ class _DriverListState extends State<DriverList> {
                             .length;
                       });
 
-                      api
-                          .fetchOrdersDistance(orders)
-                          .then((value) {
+                      api.fetchOrdersDistance(orders).then((value) {
                         setState(() {
                           widget.driverList[index].distance = value;
                         });
@@ -112,7 +143,6 @@ class _DriverListState extends State<DriverList> {
                 childrenPadding:
                     const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
                 children: [
-
                   Row(
                     children: [
                       const Text(
