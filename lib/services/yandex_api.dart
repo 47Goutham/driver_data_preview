@@ -70,7 +70,8 @@ class YandexApi{
           "id": _partnerId,
           "transaction": {
             "category_ids": [
-              "cash_collected"
+              "cash_collected",
+              "cargo_cash_collection"
             ],
             "event_at": {
               "from": fromTime,
@@ -92,7 +93,8 @@ class YandexApi{
       final jsonResponse = json.decode(response.body);
       double handCash = 0;
        jsonResponse['transactions'].forEach((val){
-         handCash += double.parse(val['amount']);
+         double amount =    val['category_id'] == 'cargo_cash_collection' ? -1 * double.parse(val['amount']) : double.parse(val['amount']) ;
+         handCash += amount;
        });
 
        return handCash;
